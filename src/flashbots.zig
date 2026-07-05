@@ -243,14 +243,17 @@ pub const Relay = struct {
     /// Create a new Relay client.
     /// auth_key is the private key used for Flashbots authentication
     /// (separate from the transaction signing key).
-    pub fn init(allocator: std.mem.Allocator, url: []const u8, auth_key: [32]u8, io: std.Io) Relay {
-        return .{
+    pub fn init(allocator: std.mem.Allocator, url: []const u8, auth_key: [32]u8, io: std.Io)  
+!*Relay {
+        const self = try allocator.create(Relay);
+        self.* =  .{
             .allocator = allocator,
             .url = url,
             .auth_signer = signer_mod.LocalSigner.init(auth_key),
             .client = .{ .allocator = allocator, .io = io },
             .next_id = 1,
         };
+        return self;
     }
 
     pub fn deinit(self: *Relay) void {
